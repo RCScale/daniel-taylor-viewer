@@ -24948,14 +24948,28 @@ renderers.stripe=function(){
     h+='<div style="font-size:18px;font-weight:700;color:var(--green)">$'+(p.amount/100).toFixed(2)+'</div>';
     h+='</div></div>';
   });
-  h+='<h2 style="font-size:16px;margin:20px 0 12px">Payment Intents</h2>';
-  pis.forEach(pi=>{
-    h+='<div class="stripe-card"><div style="display:flex;justify-content:space-between;align-items:center">';
-    h+='<div><div style="font-size:13px;font-weight:600">'+esc(pi.description||pi.id)+'</div>';
-    h+='<div style="font-size:11px;color:var(--text-muted)">'+fmtDate(tsToMs(pi.created))+' — '+esc(pi.status)+'</div></div>';
-    h+='<div style="font-size:16px;font-weight:700">$'+(pi.amount/100).toFixed(2)+'</div>';
-    h+='</div></div>';
-  });
+  const bizPis=pis.filter(pi=>(pi.description||'').includes('Red Rock Rigs'));
+  const personalPis=pis.filter(pi=>!(pi.description||'').includes('Red Rock Rigs'));
+  if(bizPis.length){
+    h+='<h2 style="font-size:16px;margin:20px 0 12px">Red Rock Rigs — Customer Payments</h2>';
+    bizPis.forEach(pi=>{
+      h+='<div class="stripe-card" style="border-left:3px solid var(--green)"><div style="display:flex;justify-content:space-between;align-items:center">';
+      h+='<div><div style="font-size:13px;font-weight:600">'+esc(pi.description||pi.id)+'</div>';
+      h+='<div style="font-size:11px;color:var(--text-muted)">'+fmtDate(tsToMs(pi.created))+' — '+esc(pi.status)+'</div></div>';
+      h+='<div style="font-size:16px;font-weight:700;color:var(--green)">+$'+(pi.amount/100).toFixed(2)+'</div>';
+      h+='</div></div>';
+    });
+  }
+  if(personalPis.length){
+    h+='<h2 style="font-size:16px;margin:20px 0 12px">Personal Charges</h2>';
+    personalPis.forEach(pi=>{
+      h+='<div class="stripe-card"><div style="display:flex;justify-content:space-between;align-items:center">';
+      h+='<div><div style="font-size:13px;font-weight:600">'+esc(pi.description||pi.id)+'</div>';
+      h+='<div style="font-size:11px;color:var(--text-muted)">'+fmtDate(tsToMs(pi.created))+' — '+esc(pi.status)+'</div></div>';
+      h+='<div style="font-size:16px;font-weight:700;color:var(--red)">-$'+(pi.amount/100).toFixed(2)+'</div>';
+      h+='</div></div>';
+    });
+  }
   el.innerHTML=h;
 };
 
